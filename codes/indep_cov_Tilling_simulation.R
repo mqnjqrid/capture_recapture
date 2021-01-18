@@ -4,13 +4,7 @@ expit = function(x) {
 logit = function(x) {
   log(x/(1 - x))
 }
-#ep = -1.7
-     #-1.29
-     #-1.1
-     #-0.9
-     #-0.6
-     #-0.2
-     #0.2
+
 ep_vec = c(-3.015, -2.513, -2.118, -1.758, -1.42, -1.065, -0.66, -0.098)
 #for l = 1, capture probabilities are 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
 ep = ep_vec[2]
@@ -51,18 +45,3 @@ dat_p = function(n, l){
               psi0 = 1 -  mean(apply(x, 1, function(xx){return((1 - pi1(xx))*(1 - pi2(xx)))}))
               ))
 }
-
-dam = numeric(length = 100)
-for(i in 1:100){
-  dam[i] = dat_p(1000, 1)$psi0
-}
-summary(dam)
-# Qnphi = mean(sapply(1:1, function(i) {
-#   x = matrix(
-#     rnorm(n*l, 0, 1),
-#     nrow = n, ncol = l)
-#   y1 = unlist(apply(x, 1, function(xi) {sample(c(0, 1), 1, replace = TRUE, prob = c( 1 - pi1(xi), pi1(xi)))}))
-#   y2 = unlist(apply(x, 1, function(xi) {sample(c(0, 1), 1, replace = TRUE, prob = c( 1 - pi2(xi), pi2(xi)))}))
-#   mean((q1*q2/q12 *(y1/q1 + y2/q2 - y1*y2/q12 - 1))[pmax(y1, y2) > 0])
-# }))
-
