@@ -1,4 +1,4 @@
-devtools::install("C:/Users/manja/Onedrive/Documents/crctmle")
+#devtools::install_github("mqnjqrid/crctmle")
 library(crctmle)
 library(ggplot2)
 library(reshape2)
@@ -9,16 +9,15 @@ library(beepr)
 n0 = 1000; l = 1
 source("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/indep_cov_Tilling_simulation.R")
 simuldraw = 50
-n_vec = c(1, 3, 5)*1000
+n_vec = c(1:5)*5000
 twolist = FALSE
-alpha_vec = 0.25#c(0.1, 0.25, 0.5)#, 0.2, 0.15, 0.1)
+alpha_vec = 0.25
 omega_vec = c(0.5, 1)
 datorg = numeric(0)
 varorg = datorg
 norg = datorg
 varnorg = datorg
 
-ti = 1
 psi0 =  dat_p(n0, l)$psi0
 set.seed(1)
 
@@ -71,19 +70,17 @@ ndata$omega = as.numeric(as.character(ndata$sigma))
 ndata = ndata
 
 # save(psidata, ndata, psi0,
-#           file = paste("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/data_psi0", round(10*psi0), ".Rdata", sep = ''))
-# load("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/data_psi08.Rdata")     
+#           file = paste("~/data/simulated/data_psi0", round(10*psi0), ".Rdata", sep = ''))
+# load("~/data/simulated/data_psi08.Rdata")     
 
-################### Plots for psi as capture probability
+################### Plots for psi and n
 dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summarise,
                            mean = mean(abs(psi - psi0)),
                            rmse = sqrt(mean((psi - psi0)^2)),
                            sd = sqrt(var(psi))
                            )
-#dat_pibctr_summary$Var2 = ordered(factor(dat_pibctr_summary$Var2), levels = c("PI", "BC", "TMLE"))
 
 dat_pibctr_summary$coverage = NA
-############## manually calculating coverage due to error on line 211-212
 for(n0 in unique(psidata$n0)){
   for(alpha in unique(psidata$alpha)){
     for(omega in unique(psidata$omega)){
@@ -98,6 +95,7 @@ for(n0 in unique(psidata$n0)){
   }
 }
 dat_pibctr_summary$coverage = 1 - dat_pibctr_summary$coverage
+
 dat_pibctr_summary$model = (factor(dat_pibctr_summary$model, levels = c("PI", "BC", "TMLE")))
   
 tsize = 12
@@ -110,26 +108,24 @@ ggbasic = ggplot(data = dat_pibctr_summary, aes(x = n0, linetype = model, shape 
   labs(color = "method", shape = "method", linetype = "method", x = 'n', y = NULL) +
   facet_grid(omega ~ alpha, labeller = label_bquote(rows = omega==.(omega), cols = alpha==.(alpha))) +
   scale_color_grey(start = 0, end = 0.75)
+#scale_fill_manual("Estimation method", values=c("red", "#E69F00", "#56B4E9", "gray"))
 
 v1 = ggbasic +
   geom_line(aes(y = mean)) +
   geom_point(size = psize, aes(y = mean, color = model)) +
   labs(title = substitute(paste("Bias of ", psi, ', true ', psi, ' = ', var), list(var = round(psi0, 1))))
 
-#scale_fill_manual("Estimation method", values=c("red", "#E69F00", "#56B4E9", "gray"))
-
 v2 = ggbasic +
   geom_line(aes(y = rmse)) +
   geom_point(size = psize, aes(y = rmse, color = model)) +
   labs(title = expression(paste("RMSE of ", psi)))
-#scale_fill_manual("Estimation method", values=c("red", "#E69F00", "#56B4E9", "gray"))
 
 v3 = ggbasic +
   geom_line(aes(y = coverage)) +
   geom_point(size = psize, aes(y = coverage, color = model)) +
   labs(title = "Mis-coverage of n")
 
-pdf(paste("C:/Users/manja/Dropbox/capture_recapture/codes/images/crc_simulated_barplots/lineplot_K2_l1_psi0", round(10*psi0), "0_alpha025.pdf", sep = ''), width = 10, height = 4.5, onefile = FALSE) #height = 375 and 415
+pdf(paste("~/plots/lineplot_K2_l1_psi0", round(10*psi0), "0_alpha025.pdf", sep = ''), width = 10, height = 4.5, onefile = FALSE)
 ggarrange(v1, v2, v3, ncol = 3, common.legend = TRUE, legend = "bottom")
 dev.off()
 
