@@ -1,5 +1,4 @@
-#devtools::install("C:/Users/manja/Onedrive/Documents/crctmle")
-devtools::install_github("mqnjqrid/crctmle")
+#devtools::install_github("mqnjqrid/crctmle")
 library(crctmle)
 library(ggplot2)
 library(reshape2)
@@ -8,7 +7,7 @@ library(ggpubr)
 library(gridExtra)
 library(beepr) 
 n0 = 5000; l = 1
-source("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/indep_cov_Tilling_simulation.R")
+source("~/indep_cov_Tilling_simulation.R")
 simuldraw = 500
 
 alpha_vec = c(0.1, 0.25, 0.5)#, 0.2, 0.15, 0.1)
@@ -68,11 +67,11 @@ ndata$n = as.numeric(as.character(ndata$n))
 ndata$varn = as.numeric(as.character(ndata$varn))
 
 #save(psidata, ndata, psi0, n0,
-#    file = paste("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/data_psi0", round(10*psi0), "_n0_", n0, ".Rdata", sep = ''))
+#    file = paste("~/data/simulated/data_psi0", round(10*psi0), "_n0_", n0, ".Rdata", sep = ''))
 #
-load("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/data_psi03_n0_5000.Rdata")
+#load("~/data/simulated/data_psi03_n0_5000.Rdata")
 
-################### Plots for psi as capture probability
+################### Plots for psi and n
 dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summarise,
                            mean = mean(abs(psi - psi0)),
                            rmse = sqrt(mean((psi - psi0)^2)),
@@ -81,7 +80,6 @@ dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summaris
 #dat_pibctr_summary$model = ordered(factor(dat_pibctr_summary$model), levels = c("PI", "BC", "TMLE"))
 
 dat_pibctr_summary$coverage = NA
-############## manually calculating coverage due to error on line 211-212
 for(alpha in unique(psidata$alpha)){
   for(omega in unique(psidata$omega)){
     for(model in unique(dat_pibctr_summary$model)){
@@ -116,7 +114,7 @@ v3 = gbasic +
   geom_bar(mapping =  aes(y = coverage), stat = "identity", color = "black") +
   labs(fill = "method", title = "Mis-coverage of n", x = NULL, y = NULL)
 
-pdf(paste("C:/Users/manja/Dropbox/capture_recapture/codes/images/crc_simulated_barplots/barplotpsi_K2_l1_psi0", round(10*psi0), "0_alpha_sigma12_bias_rmse_cvrg.pdf", sep = ''), width = 10, height = 3.5, onefile = FALSE) #height = 375 and 415
+pdf(paste("~/plots/barplotpsi_K2_l1_psi0", round(10*psi0), "0_alpha_sigma12_bias_rmse_cvrg.pdf", sep = ''), width = 10, height = 3.5, onefile = FALSE) #height = 375 and 415
 ggarrange(v1, v2, v3, ncol = 3, common.legend = TRUE, legend = "bottom")
 dev.off()
 
