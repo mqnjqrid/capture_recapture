@@ -1,7 +1,7 @@
 library(ggplot2)
 library(ggpubr)
 library(plyr)
-source("C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/peru_1.R")
+source("~/codes/peru_1.R")
 
 covariate_data = cbind(perpe, x$Sexo, age, strata, ui, x$Situacion)
 demo_cvr = cbind(covariate_data[x[,10] == 1,], "CVR")
@@ -24,7 +24,7 @@ demo_data$uifac = as.factor(demo_data$uifac)
 demo_data = na.omit(demo_data)
 demo_data = demo_data[(demo_data$sex %in% c('F', 'M')), ]
 
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/peru_demographics.pdf", height = 4.5, width = 6)
+pdf("~/plots/peru_demographics.pdf", height = 4.5, width = 6)
 ggplot(demo_data, aes(age, fill = sex)) +
   geom_density(alpha = 0.5, color = "black") +
   theme_bw() +
@@ -32,7 +32,7 @@ ggplot(demo_data, aes(age, fill = sex)) +
   facet_grid(list~perpe) +
   scale_fill_grey(start = 0.1, end = 0.8)
 dev.off()
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/sex_kill_count.pdf", height = 4.5, width = 6)
+pdf("~/plots/sex_kill_count.pdf", height = 4.5, width = 6)
 ggplot(demo_data, aes(sex, fill = sex)) +
   geom_bar(color = "black") +
   theme_bw() +
@@ -41,7 +41,7 @@ ggplot(demo_data, aes(sex, fill = sex)) +
   scale_fill_grey(start = 0.3, end = 0.8)
 dev.off()
 
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/peru_demographics_situacion.pdf", height = 4.5, width = 6)
+pdf("~/plots/peru_demographics_situacion.pdf", height = 4.5, width = 6)
 ggplot(demo_data, aes(age, fill = Situacion)) +
   geom_density(alpha = 0.5, color = "black") +
   theme_bw() +
@@ -51,7 +51,7 @@ ggplot(demo_data, aes(age, fill = Situacion)) +
 dev.off()
 
 
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/sex_kill_count_situacion.pdf", height = 4.5, width = 6)
+pdf("~/plots/p/sex_kill_count_situacion.pdf", height = 4.5, width = 6)
 ggplot(demo_data, aes(Situacion, fill = Situacion)) +
   geom_bar(color = "black", position = "dodge") +
   theme_bw() +
@@ -87,7 +87,7 @@ g4 = ggplot(demo_data, aes(Situacion, fill = sex)) +
   theme(text = element_text(size = tsize), legend.position = "none") +
   facet_grid(list~perpe, scales = "free") +
   scale_fill_grey(start = 0.3, end = 0.8)
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/peru_demographics.pdf", height = 4.5*1.2, width = 12*1.2, onefile = FALSE)
+pdf("~/plots/peru_demographics.pdf", height = 4.5*1.2, width = 12*1.2, onefile = FALSE)
 ggarrange(g1, g4, common.legend = TRUE, legend = "bottom")
 dev.off()
 
