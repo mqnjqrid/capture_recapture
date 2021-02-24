@@ -1,5 +1,5 @@
-load("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/IntermuestraV1-2.RData")
-ubigeo = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/ubigeo2002.txt", header = TRUE, sep = "\t")
+load("~/data/IntermuestraV1-2.RData")
+ubigeo = read.table("~/data/ubigeo2002.txt", header = TRUE, sep = "\t")
 
 ubigeo2 = ubigeo
 colnames(ubigeo2) = c("idepa", "iprov", "idist", "lugar")
