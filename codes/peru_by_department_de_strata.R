@@ -1,13 +1,9 @@
 #---------------------------------------------------------------------------
 #    Kill estimate by different departamentos
 #---------------------------------------------------------------------------
-devtools::install("C:/Users/manja/Onedrive/Documents/crctmle")
-library(crctmle)
-source("C:/Users/manja/Dropbox/capture_recapture/codes/indep_cov_Tilling_simulation.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/indep_cov_bias_sqmse_functions.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/superlearner_function.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/psi_indep_tmle_crossfitting_corrected.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/peru_codes/peru_1.R")
+devtools::install_github("mqnjqrid/drpop")
+library(drpop)
+source("~/peru_1.R")
 K = 2
 eps = 0.005
 provyes = FALSE
@@ -42,12 +38,7 @@ datap0 = data.frame(datap0)
 delcol = which(names(datap0) %in% c("misage", "Sexo", "Situacion", "ubina", "depna", "provna"))
 datap_modelmatrix = cbind(datap0[,-delcol], model.matrix(~misage + Sexo + Situacion, datap0))
 
-funcname = c("logit"
-             #"Mlogit",
-             #"NP",
-             # "Gam"
-             ,"sl"
-)
+funcname = c("logit", "sl")
 
 nmat = matrix(NA, nrow = 25, ncol = 6*length(funcname))
 varnmat = nmat
@@ -87,8 +78,6 @@ for (departmentos in 1:25){#c(5,9,10,12)){
     }
 
     datapset = datapset[,-which(apply(datapset[,!(names(datapset) %in% c("(Intercept)"))], 2, function(col){length(unique(col)) <= 1}))[-1]]
-    #datapset = datapset[,-which(sapply(colnames(datapset), function(col){
-    #  (!(col %in% c("x...c.10..", "list2", "(Intercept)")))&(length(unique(datapset[,col])) <= 1)}))]
 
     n = length(intersect(which(idepa == departmentos), which(perpe == agent)))
     l = ncol(datapset) - K
@@ -132,10 +121,8 @@ for (departmentos in 1:25){#c(5,9,10,12)){
 }
 
 output_n = nmat
-colnames(output_n) = paste(rep(c("EST", "SLU"), each = 3*length(funcname)), rep(paste(rep(c('P', 'SL'), each = 3), c('_PI', "_BC", "_TMLE"), sep = ''), 2), sep = '_')
+colnames(output_n) = paste(rep(c("EST", "SLU"), each = 3*length(funcname)), rep(paste(rep(c('logit', 'sl'), each = 3), c('_PI', "_DR", "_TMLE"), sep = ''), 2), sep = '_')
 colnames(nmat) = colnames(output_n)
 colnames(psimat) = colnames(output_n)
 colnames(varpsimat) = colnames(output_n)
 colnames(varnmat) = colnames(output_n)
-
-save(nmat, varnmat, psimat, varpsimat, orgsize, output_n, file = "C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/department_kills_for_map_eps0005.Rdata")
