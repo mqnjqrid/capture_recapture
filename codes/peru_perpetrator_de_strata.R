@@ -2,23 +2,14 @@ library(ggplot2)
 library(ggpubr)
 library(robustbase)
 
-devtools::install("C:/Users/manja/Onedrive/Documents/crctmle")
-library(crctmle)
-source("C:/Users/manja/Dropbox/capture_recapture/codes/indep_cov_Tilling_simulation.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/indep_cov_bias_sqmse_functions.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/superlearner_function.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/psi_indep_tmle_crossfitting_corrected.R")
-source("C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/peru_1.R")
+devtools::install_github("mqnjqrid/drpop")
+library(drpop)
+source("~/peru_1.R")
 K = 2
 nfolds = 5
 eps = 0.005
 
-funcname = c("logit"
-             #                "Mlogit",
-             #,"NP"#,
-             #                ,"Gam",
-           #  ,"sl"
-)
+funcname = c("logit", "sl")
 
 psimat = data.frame(folds = rep(1:nfolds, 5*3), situacion = rep(rep(c("DES", "MUE", "all"), each = nfolds), 5), perpetrator = rep(1:5, each = nfolds*3), matrix(NA, nrow = nfolds*3*5, ncol = length(funcname)*4))
 psiestim = data.frame(perpetrator = rep(1:5, each = 3*length(funcname)*3),
@@ -49,10 +40,7 @@ datap0$Situacion = factor(datap0$Situacion)
 datap0 = data.frame(datap0)
 datap0 = na.omit(datap0)
 
-for(situation in c("DES",
-                   "MUE"
-                 , "all"
-)){
+for(situation in c("DES", "MUE", "all")){
   delcol = which(names(datap0) %in% c("misage", "Sexo", "Situacion", "ubina", "depna", "provna"))
   if(situation == "all"){
     datap_modelmatrix = cbind(datap0[,-delcol], model.matrix(~misage + Sexo + Situacion + perpe1, datap0))
@@ -64,9 +52,7 @@ for(situation in c("DES",
     datap_modelmatrix = cbind(datap[,-delcol], model.matrix(~misage + Sexo + perpe1, datap))
   }
 
-  #datap_modelmatrix = datap_modelmatrix[,-which(apply(datap_modelmatrix, 2, function(col){length(unique(col)) <= 1}))[-1]]
-
-  for(agent in list(c(1), c(2), c(3), c(4))){
+    for(agent in list(c(1), c(2), c(3), c(4))){
 
     print(c(agent))
     K = 2
@@ -128,19 +114,16 @@ psibarplot = psiestim
 psibarplot$situacion = factor(psibarplot$situacion)
 levels(psibarplot$situacion) = list("disappeared"="DES", "dead"="MUE", "combined"="all")
 psibarplot$method = factor(psibarplot$method)
-levels(psibarplot$method) = list("PI"="PI", "BC"="BC", "TMLE"="TMLE", "BCTMLE"="BCTMLE")
+levels(psibarplot$method) = list("PI"="PI", "DR"="DR", "TMLE"="TMLE")
 psibarplot$perpetrator = factor(psibarplot$perpetrator)
 levels(psibarplot$perpetrator) = list("EST"=1, "SLU"=2, "OTR"=3, "NOD"=4, "Total"=5)
 tsize = 12
 psibarplot$n_hat = as.numeric(as.character(psibarplot$n_hat))
 options(scipen = 5)
-#save(psimat, psiestim, psibarplot, file = "C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/killing_barplot2_eps0005_latlong_de_strata.Rdata")
-
-#load("C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/killing_barplot2_eps0005_latlong_de_strata.Rdata")
 
 tsize = 15
 
-psipibctr = ggplot(psibarplot[psibarplot$perpetrator %in% c("EST", "SLU", "OTR", "NOD", "Total") & psibarplot$method != "BCTMLE",], aes(x = perpetrator, y = n_hat, fill = perpetrator)) +
+psipibctr = ggplot(psibarplot, aes(x = perpetrator, y = n_hat, fill = perpetrator)) +
   geom_bar(stat = "identity") +
   theme_bw() +
   ylab("Number of killings") +
@@ -151,22 +134,3 @@ psipibctr = ggplot(psibarplot[psibarplot$perpetrator %in% c("EST", "SLU", "OTR",
   theme(text = element_text(size = tsize), axis.text.x = element_blank(), axis.ticks.x=element_blank(), axis.title.x=element_blank(), legend.position = "bottom")
 
 psipibctr
-#psimat[psimat$perpetrator == 5 & psimat$situacion == "all",]
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/killcount_allcoordinates_1_23_nod_corrected_eps0005_latlong_de_strata.pdf", width = 9, height = 6)
-psipibctr
-dev.off()
-
-psis = merge(psibarplotdes, merge(psibarplotmue, psibarplotall, by = c("model", "perpetrator", "method"), suffixes = c('mue', '')), by = c("model", "perpetrator", "method"), suffixes = c('des', ''))
-psis$n_hat = as.numeric(as.character(psis$n_hat))
-psis$n_hatdes = as.numeric(as.character(psis$n_hatdes))
-psis$n_hatmue = as.numeric(as.character(psis$n_hatmue))
-
-ggplot(psis, aes(x = n_hat, y = n_hatdes + n_hatmue)) +
-  geom_point(aes(color = perpetrator)) +
-  facet_grid(method~model) +
-  geom_abline(intercept = 0, slope = 1)
-
-n - N + N*colMedians(est_val$psi_summary, na.rm = TRUE)
-n - N + N*colMedians(est_val$psi_summary2, na.rm = TRUE)
-N*colMedians(est_val$var_summary, na.rm = TRUE) + N*colMedians(est_val$psi_summary, na.rm = TRUE)*(colMedians(est_val$psi_summary, na.rm = TRUE) - 1)
-N*colMedians(est_val$var_summary2, na.rm = TRUE) + N*colMedians(est_val$psi_summary2, na.rm = TRUE)*(colMedians(est_val$psi_summary2, na.rm = TRUE) - 1)
