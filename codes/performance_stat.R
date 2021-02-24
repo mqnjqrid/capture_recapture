@@ -1,5 +1,5 @@
-#devtools::install_github("mqnjqrid/crctmle")
-library(crctmle)
+#devtools::install_github("mqnjqrid/drpop")
+library(drpop)
 library(ggplot2)
 library(reshape2)
 library(plyr)
@@ -77,7 +77,7 @@ dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summaris
                            rmse = sqrt(mean((psi - psi0)^2)),
                            sd = sqrt(var(psi))
 )
-#dat_pibctr_summary$model = ordered(factor(dat_pibctr_summary$model), levels = c("PI", "BC", "TMLE"))
+#dat_pibctr_summary$model = ordered(factor(dat_pibctr_summary$model), levels = c("PI", "DR", "TMLE"))
 
 dat_pibctr_summary$coverage = NA
 for(alpha in unique(psidata$alpha)){
@@ -114,7 +114,4 @@ v3 = gbasic +
   geom_bar(mapping =  aes(y = coverage), stat = "identity", color = "black") +
   labs(fill = "method", title = "Mis-coverage of n", x = NULL, y = NULL)
 
-pdf(paste("~/plots/barplotpsi_K2_l1_psi0", round(10*psi0), "0_alpha_sigma12_bias_rmse_cvrg.pdf", sep = ''), width = 10, height = 3.5, onefile = FALSE) #height = 375 and 415
 ggarrange(v1, v2, v3, ncol = 3, common.legend = TRUE, legend = "bottom")
-dev.off()
-
