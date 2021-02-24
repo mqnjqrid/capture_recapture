@@ -2,21 +2,9 @@ library(sf)
 library(lwgeom)
 library(plyr)
 library(dplyr)
-source("C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/peru_data.R")
-peru_all = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_all.tab", sep = '\t', header = TRUE)
-#peru_dep_coor = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_dep_coor.tab", sep = '\t')
-#peru_de_acor = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_de_acor.tab", sep = '\t', header = TRUE)
-#peru_di_acor = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_p_acor.tab", sep = '\t', header = TRUE)
-#peru_p_acor = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_di_acor.tab", sep = '\t', header = TRUE)
-
-#peru_dep = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_dep.tab", sep = '\t', header = TRUE)
-#peru_dist = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_dist.tab", sep = '\t', header = TRUE)
-#peru_prov = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/peru_prov.tab", sep = '\t', header = TRUE)
-
-distxy = read.table("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/distxy.tab", sep = '\t', header = TRUE)
-
-#library(foreign)
-#dd = read.dbf("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/departamentos.dbf")
+source("~/peru_data.R")
+peru_all = read.table("~/data/peru_all.tab", sep = '\t', header = TRUE)
+distxy = read.table("~/data/distxy.tab", sep = '\t', header = TRUE)
 
 strata = rep(59, nrow(x))
 
@@ -91,7 +79,7 @@ jj[strata == 48] = 5
 jj[strata %in% c(2, 6)] = 6
 
 ####################################################
-peru = st_read("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/shape_files/DEPARTAMENTOS.shp", stringsAsFactors = FALSE, quiet = TRUE)
+peru = st_read("~/shape_files/DEPARTAMENTOS.shp", stringsAsFactors = FALSE, quiet = TRUE)
 peru_ll <- st_transform(peru, "+proj=longlat +ellps=WGS84 +datum=WGS84")
 coordfile = st_coordinates(peru_ll)
 depcoord = aggregate(cbind(X, Y) ~ L3, "mean" , data = coordfile)
@@ -99,7 +87,7 @@ depcoord = cbind(peru$IDDPTO, depcoord[,2:3])
 colnames(depcoord) = c("IDDPTO", "x_de", "y_de")
 depcoord$area_de = units::set_units(x = st_area(peru), value = hectare)
 
-peru = st_read("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/shape_files/PROVINCIAS.shp", stringsAsFactors = FALSE, quiet = TRUE)
+peru = st_read("~/PROVINCIAS.shp", stringsAsFactors = FALSE, quiet = TRUE)
 peru_ll <- st_transform(peru, "+proj=longlat +ellps=WGS84 +datum=WGS84")
 coordfile = st_coordinates(peru_ll)
 provcoord = aggregate(cbind(X, Y) ~ L3, "mean" , data = coordfile)
@@ -107,7 +95,7 @@ provcoord = cbind(peru$IDPROV, provcoord[,2:3])
 colnames(provcoord) = c("IDPROV", "x_p", "y_p")
 provcoord$area_p = units::set_units(x = st_area(peru), value = hectare)
 
-peru = st_read("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/shape_files/DISTRITOS.shp", stringsAsFactors = FALSE, quiet = TRUE)
+peru = st_read("~/DISTRITOS.shp", stringsAsFactors = FALSE, quiet = TRUE)
 peru_ll <- st_transform(peru, "+proj=longlat +ellps=WGS84 +datum=WGS84")
 coordfile = st_coordinates(peru_ll)
 distcoord = aggregate(cbind(X, Y) ~ L3, "mean" , data = coordfile)
@@ -126,10 +114,6 @@ depcoord$IDDPTO = as.numeric(as.character(depcoord$IDDPTO))
 provcoord$IDPROV = as.numeric(as.character(provcoord$IDPROV))
 
 ##############
-# ui1 = ui
-# ui1[is.na(ui1)] = 0
-# ssnocord = unique(sort(ui1[(ui %in% perucoord$IDDIST) == F & round(ui1%%100) > 0]))
-
 ss = cbind(idepa, iprov, idist, strata)
 ss = data.frame(ss)
 ss$IDDIST = idepa*10000 + iprov*100 + idist
@@ -155,9 +139,6 @@ sscombo[order(sscombo$IDPROV, sscombo$idepa),]
 cordarea = matrix(NA, ncol = 3, nrow = 58)
 colnames(cordarea) = c("long", "lat", "area")
 for(strataa in 1:58){
-  #print(c(strataa, length(unique(idist[strata == strataa])), length(unique(iprov[strata == strataa])),
-  #        length(unique(idepa[strata == strataa])), length(unique(strata[iprov %in% unique(iprov[strata == strataa])])),
-  #         length(unique(strata[idepa %in% unique(idepa[strata == strataa])]))))
   strataset = sscombo[sscombo$strata == strataa,]
 
   if(length(unique(sscombo[sscombo$idepa %in% strataset$idepa,]$strata)) == 1) {print(c(strataa, 1))
