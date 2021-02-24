@@ -1,5 +1,5 @@
-#devtools::install_github("mqnjqrid/crctmle")
-library(crctmle)
+#devtools::install_github("mqnjqrid/drpop")
+library(drpop)
 library(ggplot2)
 library(reshape2)
 library(plyr)
@@ -7,7 +7,7 @@ library(ggpubr)
 library(gridExtra)
 library(beepr)
 n0 = 1000; l = 1
-source("C:/Users/manja/Dropbox/capture_recapture/codes/cond_indep_pair/indep_cov_Tilling_simulation.R")
+source("~/indep_cov_Tilling_simulation.R")
 simuldraw = 50
 n_vec = c(1:5)*5000
 twolist = FALSE
@@ -69,10 +69,6 @@ ndata$omega = as.numeric(as.character(ndata$sigma))
 
 ndata = ndata
 
-# save(psidata, ndata, psi0,
-#           file = paste("~/data/simulated/data_psi0", round(10*psi0), ".Rdata", sep = ''))
-# load("~/data/simulated/data_psi08.Rdata")     
-
 ################### Plots for psi and n
 dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summarise,
                            mean = mean(abs(psi - psi0)),
@@ -96,7 +92,7 @@ for(n0 in unique(psidata$n0)){
 }
 dat_pibctr_summary$coverage = 1 - dat_pibctr_summary$coverage
 
-dat_pibctr_summary$model = (factor(dat_pibctr_summary$model, levels = c("PI", "BC", "TMLE")))
+dat_pibctr_summary$model = (factor(dat_pibctr_summary$model, levels = c("PI", "DR", "TMLE")))
   
 tsize = 12
 psize = 3
@@ -125,7 +121,4 @@ v3 = ggbasic +
   geom_point(size = psize, aes(y = coverage, color = model)) +
   labs(title = "Mis-coverage of n")
 
-pdf(paste("~/plots/lineplot_K2_l1_psi0", round(10*psi0), "0_alpha025.pdf", sep = ''), width = 10, height = 4.5, onefile = FALSE)
 ggarrange(v1, v2, v3, ncol = 3, common.legend = TRUE, legend = "bottom")
-dev.off()
-
