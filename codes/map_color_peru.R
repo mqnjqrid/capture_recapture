@@ -1,6 +1,4 @@
-#rm(list=ls(all=TRUE))
-
-# load maps ---------------------------------------------------------------
+# color departments of Peru by number of killings
 
 library(ggmap)
 library(ggplot2)
@@ -9,18 +7,16 @@ library(maptools)
 library(maps)
 library(viridis)
 library(reshape2)
-#remotes::install_github("tylermorganwall/rayshader")
 library(rayshader)
 library(tidyverse)
 library(sf)
 # first map of Peru -----------------------------------------------------
 
-peru = st_read("C:/Users/manja/Dropbox/capture_recapture/data/Peru_killings/shape_files/DEPARTAMENTOS.shp", quiet = TRUE)
+peru = st_read("~/shape_files/DEPARTAMENTOS.shp", quiet = TRUE)
 k = 1
-#load("C:/Users/manja/Dropbox/capture_recapture/codes/Peru_codes/department_kills_for_map_eps0005.Rdata")
-slu_est_diff = output_n[,str_subset(colnames(output_n),"SLU_SL")] -
-               output_n[,str_subset(colnames(output_n),"EST_SL")]
-colnames(slu_est_diff) = gsub("SLU_", "", str_subset(colnames(output_n),"SLU_SL"))
+slu_est_diff = output_n[,str_subset(colnames(output_n),"SLU_sl")] -
+               output_n[,str_subset(colnames(output_n),"EST_sl")]
+colnames(slu_est_diff) = gsub("SLU_", "", str_subset(colnames(output_n),"SLU_sl"))
 
 library(scales) #for trans_new
 modulus_trans <- function(lambda){
@@ -56,22 +52,10 @@ peru_dep = rbind(peru_dep, cbind(peru, colvecvalue))
 colvecvalue = cbind(slu_est_diff[,3], charcols(strsplit(colnames(slu_est_diff)[3], '_'), 25))
 peru_dep = rbind(peru_dep, cbind(peru, colvecvalue))
 
-if(length(funcname) >1 & FALSE){
-  slu_est_diff = output_n[,str_subset(colnames(output_n),"SLU_P")] -
-    output_n[,str_subset(colnames(output_n),"EST_P")]
-  colnames(slu_est_diff) = gsub("SLU_", "", str_subset(colnames(output_n),"SLU_P"))
-  colvecvalue = cbind(slu_est_diff[,1], charcols(strsplit(colnames(slu_est_diff)[1], '_'), 25))
-  peru_dep = rbind(peru_dep, cbind(peru, colvecvalue))
-  colvecvalue = cbind(slu_est_diff[,2], charcols(strsplit(colnames(slu_est_diff)[2], '_'), 25))
-  peru_dep = rbind(peru_dep, cbind(peru, colvecvalue))
-  colvecvalue = cbind(slu_est_diff[,3], charcols(strsplit(colnames(slu_est_diff)[3], '_'), 25))
-  peru_dep = rbind(peru_dep, cbind(peru, colvecvalue))
-}
-
 colnames(peru_dep)[5:7] = c("difference", "model", "method")
 peru_dep$difference = as.numeric(as.character(peru_dep$difference))
-peru_dep$model = factor(peru_dep$model, levels = c('P', 'SL'))
-peru_dep$method = factor(peru_dep$method, levels = c("PI", "BC", "TMLE"))
+peru_dep$model = factor(peru_dep$model, levels = c('logit', 'sl'))
+peru_dep$method = factor(peru_dep$method, levels = c("PI", "DR", "TMLE"))
 label_vec = c(round(min(slu_est_diff)), -1500, -1000, -500, -100, 0, 100,  500, 1000, 1500, round(max(slu_est_diff)))
 gmodulus = ggplot(peru_dep[peru_dep$model != "SjL",]) +
   geom_sf(aes(fill = difference)) +
@@ -92,18 +76,13 @@ gmodulus = ggplot(peru_dep[peru_dep$model != "SjL",]) +
   theme(text = element_text(size=12), axis.text.x = element_text(angle = 90), legend.position = "bottom", legend.key.width = unit(2.5, "cm"))
 gmodulus
 
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/kill_slu_est_diff_P_SL_1_23_eps0005.pdf")
-gmodulus
-dev.off()
-
-
 ##############################################################################
-###                  PROPORTION BETWEEN SLU AND EST
+###                  RATIO BETWEEN SLU AND EST
 ##############################################################################
 
-slu_est_prop = output_n[,str_subset(colnames(output_n),"SLU_SL")]/(output_n[,str_subset(colnames(output_n),"SLU_SL")] +
-  output_n[,str_subset(colnames(output_n),"EST_SL")])
-colnames(slu_est_prop) = gsub("SLU_SL_", "", str_subset(colnames(output_n),"SLU_SL"))
+slu_est_prop = output_n[,str_subset(colnames(output_n),"SLU_sl")]/(output_n[,str_subset(colnames(output_n),"SLU_sl")] +
+  output_n[,str_subset(colnames(output_n),"EST_sl")])
+colnames(slu_est_prop) = gsub("SLU_sl_", "", str_subset(colnames(output_n),"SLU_sl"))
 zero = 0
 min_slu_est_prop = min(slu_est_prop)
 
@@ -134,7 +113,5 @@ gprop = ggplot(peru_dep) +
   theme_bw() +
   theme(text = element_text(size=12), axis.text.x = element_text(angle = 90), legend.position = "bottom", legend.key.width = unit(2.5, "cm"))
 gprop
-pdf("C:/Users/manja/Dropbox/capture_recapture/codes/images/peru_kill_map/kill_slu_est_prop_P_SL_1_23.pdf")
-gprop
-dev.off()
+
 ##############################################################################
