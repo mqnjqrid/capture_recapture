@@ -14,6 +14,7 @@ library(sf)
 
 peru = st_read("~/shape_files/DEPARTAMENTOS.shp", quiet = TRUE)
 k = 1
+load("~/data/department_kills_for_map_eps0005.Rdata")
 slu_est_diff = output_n[,str_subset(colnames(output_n),"SLU_sl")] -
                output_n[,str_subset(colnames(output_n),"EST_sl")]
 colnames(slu_est_diff) = gsub("SLU_", "", str_subset(colnames(output_n),"SLU_sl"))
