@@ -126,3 +126,5 @@ colnames(nmat) = colnames(output_n)
 colnames(psimat) = colnames(output_n)
 colnames(varpsimat) = colnames(output_n)
 colnames(varnmat) = colnames(output_n)
+
+save(output_n, file = "~/data/department_kills_for_map_eps0005.Rdata")
