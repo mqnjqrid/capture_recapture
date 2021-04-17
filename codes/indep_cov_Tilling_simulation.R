@@ -7,7 +7,7 @@ logit = function(x) {
 
 ep_vec = c(-3.015, -2.513, -2.118, -1.758, -1.42, -1.065, -0.66, -0.098)
 #for l = 1, capture probabilities are 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
-ep = ep_vec[2]
+ep = ep_vec[it]
 pi1 = function(x) {
   expit( ep + sum(c(0.4)*x))
 }
@@ -16,7 +16,6 @@ pi2 = function(x) {
 }
 dat_p = function(n, l){
   x = matrix(runif(n*l, 0, 1) + 2,
-             #rnorm(n*l, 0, 1)+2,
              nrow = n, ncol = l)
   y1 = unlist(apply(x, 1, function(xi) {sample(c(0, 1), 1, replace = TRUE, prob = c( 1 - pi1(xi), pi1(xi)))}))
   y2 = unlist(apply(x, 1, function(xi) {sample(c(0, 1), 1, replace = TRUE, prob = c( 1 - pi2(xi), pi2(xi)))}))

@@ -1,4 +1,3 @@
-#devtools::install_github("mqnjqrid/drpop")
 library(drpop)
 library(ggplot2)
 library(reshape2)
@@ -6,13 +5,14 @@ library(plyr)
 library(ggpubr)
 library(gridExtra)
 library(beepr)
-n0 = 1000; l = 1
-source("~/indep_cov_Tilling_simulation.R")
-simuldraw = 50
+#it = 2, 4, 7 for psi = 0.3, 0.5, 0.8
+n0 = 1000; l = 1; it = 2
+source("indep_cov_Tilling_simulation.R")
+simuldraw = 500
 n_vec = c(1:5)*5000
 twolist = FALSE
 alpha_vec = 0.25
-omega_vec = c(0.5, 1)
+omega_vec = 1
 datorg = numeric(0)
 varorg = datorg
 norg = datorg
@@ -69,7 +69,11 @@ ndata$omega = as.numeric(as.character(ndata$sigma))
 
 ndata = ndata
 
-################### Plots for psi and n
+save(psidata, ndata, psi0,
+         file = paste("data_psi0", round(10*psi0), ".Rdata", sep = ''))
+#load("cond_indep_pair/data_psi08.Rdata")     
+
+################### Plots for psi as capture probability
 dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summarise,
                            mean = mean(abs(psi - psi0)),
                            rmse = sqrt(mean((psi - psi0)^2)),
@@ -77,6 +81,7 @@ dat_pibctr_summary = ddply(psidata, c("alpha", "omega", "n0", "model"), summaris
                            )
 
 dat_pibctr_summary$coverage = NA
+############## manually calculating coverage
 for(n0 in unique(psidata$n0)){
   for(alpha in unique(psidata$alpha)){
     for(omega in unique(psidata$omega)){
@@ -90,21 +95,21 @@ for(n0 in unique(psidata$n0)){
     }
   }
 }
-dat_pibctr_summary$coverage = 1 - dat_pibctr_summary$coverage
-
 dat_pibctr_summary$model = (factor(dat_pibctr_summary$model, levels = c("PI", "DR", "TMLE")))
-  
+dat_pibctr_summary = data.frame(dat_pibctr_summary)
 tsize = 12
 psize = 3
 
-ggbasic = ggplot(data = dat_pibctr_summary, aes(x = n0, linetype = model, shape = model)) +
+ggbasic = ggplot(data = dat_pibctr_summary[dat_pibctr_summary$omega == 1,],
+                 aes(x = n0, linetype = model, shape = model)) +
   theme_bw() +
-  theme(legend.key.width = unit(3, "line"), legend.text=element_text(size = tsize), text = element_text(size = tsize), axis.text.x = element_text(angle = 0), legend.position = "bottom") +
+  theme(legend.key.width = unit(3, "line"), legend.text=element_text(size = tsize), text = element_text(size = tsize), axis.text.x = element_text(angle = 0),
+        legend.position = "bottom", panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   scale_x_continuous(breaks = seq(min(dat_pibctr_summary$n0), max(dat_pibctr_summary$n0), 10000)) +
   labs(color = "method", shape = "method", linetype = "method", x = 'n', y = NULL) +
-  facet_grid(omega ~ alpha, labeller = label_bquote(rows = omega==.(omega), cols = alpha==.(alpha))) +
-  scale_color_grey(start = 0, end = 0.75)
-#scale_fill_manual("Estimation method", values=c("red", "#E69F00", "#56B4E9", "gray"))
+  scale_color_grey(start = 0, end = 0.75, breaks = c("PI", "DR", "TMLE"), labels = c("Plug-in", "Doubly robust", "TMLE")) +
+  scale_linetype_manual(values = c("solid", "dotted", "dashed"), breaks = c("PI", "DR", "TMLE"), labels = c("Plug-in", "Doubly robust", "TMLE")) +
+  scale_shape_manual(values = c(16, 17, 15), breaks = c("PI", "DR", "TMLE"), labels = c("Plug-in", "Doubly robust", "TMLE"))
 
 v1 = ggbasic +
   geom_line(aes(y = mean)) +
@@ -117,8 +122,10 @@ v2 = ggbasic +
   labs(title = expression(paste("RMSE of ", psi)))
 
 v3 = ggbasic +
+  geom_hline(yintercept = 0.95, linetype = "dotdash", color = "grey") +
+  scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 0.95, 1)) +
   geom_line(aes(y = coverage)) +
   geom_point(size = psize, aes(y = coverage, color = model)) +
-  labs(title = "Mis-coverage of n")
+  labs(title = "Coverage of n")
 
 ggarrange(v1, v2, v3, ncol = 3, common.legend = TRUE, legend = "bottom")
