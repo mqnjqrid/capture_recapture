@@ -7,8 +7,9 @@ library(gridExtra)
 library(beepr)
 #it = 2, 4, 7 for psi = 0.3, 0.5, 0.8
 n0 = 5000; l = 1; it = 2
-source("indep_cov_Tilling_simulation.R")
-simuldraw = 500
+setwd("C:/Users/manja/OneDrive/Documents/Capture_Recapture")
+source("codes/indep_cov_Tilling_simulation.R")
+simuldraw = 100
 
 alpha_vec = c(0.1, 0.2, 0.25, 0.3, 0.4, 0.5)
 omega_vec = c(1)
@@ -33,7 +34,7 @@ for(alp in 1:length(alpha_vec)) {
 
       N = sum(pmax(List_matrix[,1], List_matrix[,2]))
 
-      est_val = psinhat_simul(List_matrix, n = n0, K = 2, omega = omega, alpha = alpha, twolist = twolist, eps = 0.005, nfolds = 1)
+      est_val = popsize_simul(List_matrix, n = n0, K = 2, omega = omega, alpha = alpha, twolist = twolist, eps = 0.01, nfolds = 1, iter = 10)
 
       datorg = rbind(datorg, cbind(est_val$psi, alpha, omega, n0))
 
