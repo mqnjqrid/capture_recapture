@@ -42,5 +42,5 @@ dat_p = function(n, l){
   q12 = p2*p1/(1 - (1-p1)*(1-p2))
   return(list(List_matrix = List_matrix, List_matrix_xstar = List_matrix_xstar,
               psi0 = 1 -  mean(apply(x, 1, function(xx){return((1 - pi1(xx))*(1 - pi2(xx)))}))
-              ))
+         ))
 }

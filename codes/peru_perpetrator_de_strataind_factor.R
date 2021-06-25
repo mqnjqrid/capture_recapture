@@ -20,7 +20,7 @@ funcname = c("ranger")
 psiestim = data.frame(perpetrator = rep(1:5, each = 3*length(funcname)*3),
                       situacion = rep(rep(c("DES", "MUE", "all"), each = length(funcname)*3), 5),
                       matrix(NA, ncol = 10, nrow = 3*3*5*length(funcname)))
-colnames(psiestim)[-(1:2)] = c("listpair", "model", "method", "psi", "sigma", "n", "sdn", "cin.l", "cin.u", "N")
+colnames(psiestim)[-(1:2)] = c("listpair", "model", "method", "psi", "sigma", "n", "sigman", "cin.l", "cin.u", "N")
 
 list1 = x[,10]
 list2 = pmax(x[,16], x[,17])
@@ -89,7 +89,7 @@ for(situation in c("DES", "MUE", "all")){
 
     N = length(which(rowSums(List_matrix[,1:K]) > 0))
     if (N >= 5) {
-      est_val = psinhat(List_matrix, K = K, funcname = funcname, nfolds = nfolds, eps = eps, twolist = FALSE, Nmin = 200, sl.lib = c("SL.ranger"))
+      est_val = popsize(List_matrix, K = K, funcname = funcname, nfolds = nfolds, eps = eps, twolist = FALSE, Nmin = 200, sl.lib = c("SL.ranger"))
       if("DR" %in% est_val$result$method){
         psiestim[psiestim$situacion == situation & psiestim$perpetrator == agent, 3:11] = est_val$result
         psiestim[psiestim$situacion == situation & psiestim$perpetrator == agent, 'N'] = est_val$N
@@ -120,7 +120,7 @@ for(situation in c("DES", "MUE", "all")){
   
   N = length(which(rowSums(List_matrix[,1:K]) > 0))
   if (N >= 5) {
-    est_val = psinhat(List_matrix, K = K, funcname = funcname, nfolds = nfolds, eps = 0.01, twolist = FALSE)
+    est_val = popsize(List_matrix, K = K, funcname = funcname, nfolds = nfolds, eps = 0.01, twolist = FALSE)
     psiestim[psiestim$situacion == situation & psiestim$perpetrator == agent, 3:11] = est_val$result
     psiestim[psiestim$situacion == situation & psiestim$perpetrator == agent, 'N'] = est_val$N
   }else{

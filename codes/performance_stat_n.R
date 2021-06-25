@@ -7,7 +7,7 @@ library(gridExtra)
 library(beepr)
 #it = 2, 4, 7 for psi = 0.3, 0.5, 0.8
 n0 = 1000; l = 1; it = 2
-source("indep_cov_Tilling_simulation.R")
+source("codes/indep_cov_Tilling_simulation.R")
 simuldraw = 500
 n_vec = c(1:5)*5000
 twolist = FALSE
@@ -34,7 +34,7 @@ for(n0 in n_vec) {
 
         N = sum(pmax(List_matrix[,1], List_matrix[,2]))
 
-        est_val = psinhat_simul(List_matrix, n = n0, K = 2, omega = omega, alpha = alpha, twolist = twolist, eps = 0.005, nfolds = 2)
+        est_val = popsize_simul(List_matrix, n = n0, K = 2, omega = omega, alpha = alpha, twolist = twolist, eps = 0.005, nfolds = 2)
 
         datorg = rbind(datorg, cbind(est_val$psi, alpha, omega, n0))
 
